@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<title>משחק טריוויה – קופסת הכדורים</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f9;
+    direction: rtl;
+  }
+  h1 {
+    color: #333;
+  }
+  .box {
+    font-size: 50px;
+    margin: 20px 0;
+  }
+  button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    font-size: 18px;
+  }
+  #feedback {
+    font-weight: bold;
+    margin: 10px 0;
+    font-size: 18px;
+  }
+</style>
+</head>
+<body>
+
+<h1>משחק טריוויה – קופסת הכדורים</h1>
+
+<div class="box" id="boxDisplay">
+  🟥🟥🟥🟥 🟦🟦🟦 🟩
+</div>
+
+<div id="questionContainer">
+  <p id="question"></p>
+  <div id="answers"></div>
+  <div id="feedback"></div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "מה ההסתברות שהכדור הראשון שיוצא יהיה אדום?",
+    answers: [
+      {text: "\\( \\frac{4}{8} \\)", correct: true},
+      {text: "\\( \\frac{1}{3} \\)", correct: false},
+      {text: "\\( \\frac{1}{4} \\)", correct: false},
+      {text: "\\( \\frac{3}{8} \\)", correct: false}
+    ]
+  },
+  {
+    q: "מה ההסתברות שהכדור הראשון יהיה כחול?",
+    answers: [
+      {text: "\\( \\frac{1}{8} \\)", correct: false},
+      {text: "\\( \\frac{3}{8} \\)", correct: true},
+      {text: "\\( \\frac{1}{2} \\)", correct: false},
+      {text: "\\( \\frac{3}{4} \\)", correct: false}
+    ]
+  },
+  {
+    q: "מה ההסתברות שהכדור הראשון יהיה ירוק?",
+    answers: [
+      {text: "\\( \\frac{1}{8} \\)", correct: true},
+      {text: "\\( \\frac{1}{4} \\)", correct: false},
+      {text: "\\( \\frac{3}{8} \\)", correct: false},
+      {text: "\\( \\frac{1}{2} \\)", correct: false}
+    ]
+  },
+  {
+    q: "מה ההסתברות ששני הכדורים יהיו באותו צבע?",
+    answers: [
+      {text: "\\( \\frac{4}{8} \\times \\frac{3}{7} + \\frac{3}{8} \\times \\frac{2}{7} \\)", correct: true},
+      {text: "\\( \\frac{4}{8} \\times \\frac{4}{7} + \\frac{3}{8} \\times \\frac{3}{7} \\)", correct: false},
+      {text: "\\( \\frac{4}{8} \\times \\frac{1}{7} + \\frac{3}{8} \\times \\frac{2}{7} \\)", correct: false},
+      {text: "\\( \\frac{1}{2} \\times \\frac{1}{2} \\)", correct: false}
+    ]
+  },
+  {
+    q: "מה ההסתברות ששני הכדורים יהיו בצבעים שונים?",
+    answers: [
+      {text: "\\( 1 - (\\frac{4}{8} \\times \\frac{3}{7} + \\frac{3}{8} \\times \\frac{2}{7}) \\)", correct: true},
+      {text: "\\( \\frac{4}{8} \\times \\frac{3}{7} + \\frac{3}{8} \\times \\frac{2}{7} \\)", correct: false},
+      {text: "\\( \\frac{1}{2} \\)", correct: false},
+      {text: "\\( \\frac{3}{8} \\)", correct: false}
+    ]
+  },
+  {
+    q: "מה ההסתברות שהכדור הראשון יהיה אדום והשני כחול?",
+    answers: [
+      {text: "\\( \\frac{4}{8} \\times \\frac{3}{7} \\)", correct: true},
+      {text: "\\( \\frac{3}{8} \\times \\frac{4}{7} \\)", correct: false},
+      {text: "\\( \\frac{1}{2} \\times \\frac{1}{2} \\)", correct: false},
+      {text: "\\( \\frac{1}{8} \\)", correct: false}
+    ]
+  }
+];
+
+let currentQuestion = 0;
+let score = 0;
+
+function showQuestion() {
+  document.getElementById('feedback').innerHTML = "";
+  const q = questions[currentQuestion];
+  document.getElementById('question').innerHTML = q.q;
+
+  const answersDiv = document.getElementById('answers');
+  answersDiv.innerHTML = "";
+  q.answers.forEach((a) => {
+    const btn = document.createElement('button');
+    btn.innerHTML = a.text;
+    btn.onclick = () => checkAnswer(a.correct);
+    answersDiv.appendChild(btn);
+  });
+
+  MathJax.typesetPromise(); // Render MathJax
+}
+
+function checkAnswer(correct) {
+  const feedback = document.getElementById('feedback');
+  if (correct) {
+    feedback.innerHTML = "✅ תשובה נכונה!";
+    score++;
+  } else {
+    feedback.innerHTML = "❌ תשובה לא נכונה";
+  }
+
+  currentQuestion++;
+  if (currentQuestion < questions.length) {
+    setTimeout(showQuestion, 1500);
+  } else {
+    setTimeout(showResult, 1500);
+  }
+}
+
+function showResult() {
+  document.getElementById('questionContainer').innerHTML = `
+    <h2>🎉 סיימת את המשחק!</h2>
+    <p>התוצאה שלך: ${score} מתוך ${questions.length}</p>
+  `;
+}
+
+showQuestion();
+</script>
+</body>
+</html>
